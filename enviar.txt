@@ -1,0 +1,41 @@
+create or replace function enviarMensaje(destinatario varchar2,emisor varchar2,asunto varchar2,mensaje varchar2) return number as
+NUMERO entrada_ntab.idmensaje%TYPE :=0;
+NUMERO1 salida_ntab.idmensaje%TYPE :=0;
+usuarios enfermedad_t := lista(destinatario,' ');
+nusuarios number(10) :=0;
+i number(3) :=0;
+begin
+
+i := 1;
+ while ((i <= 100)) 
+    loop
+         
+        if usuarios(i) != ' ' then 
+        nusuarios := nusuarios +1;
+        else
+        i:=100;
+        end if;
+    i := i+1;
+    end loop;
+  FOR i IN 1..nusuarios LOOP
+
+     update bandeja_objtab b set b.NUEVO_MENSAJE=1 where usuario=TRIM(usuarios(i));
+     select MAX(idmensaje) into numero from table(select mensajesEntrada from bandeja_objtab where usuario=TRIM(usuarios(i))); 
+
+      insert into table(select mensajesEntrada from bandeja_objtab where usuario=TRIM(usuarios(i)) ) values(numero+1,asunto,
+      (select ref(c) from usuario_objtab c where c.USUARIO=TRIM(usuarios(i)) ),(select ref(c) from usuario_objtab c where c.USUARIO=TRIM(emisor)),mensaje
+      ,sysdate,0);
+ 
+      select MAX(idmensaje) into numero1 from table(select mensajesSalida from bandeja_objtab where usuario=TRIM(emisor)); 
+      insert into table(select mensajesSalida from bandeja_objtab where usuario=TRIM(emisor)) values(numero1+1,asunto,
+      (select ref(c) from usuario_objtab c where c.USUARIO=TRIM(usuarios(i)) ),(select ref(c) from usuario_objtab c where c.USUARIO=TRIM(emisor)),mensaje
+      ,sysdate,0);
+   end loop;
+
+return 0;
+
+EXCEPTION
+WHEN NO_DATA_FOUND THEN
+RETURN 1;
+
+end;

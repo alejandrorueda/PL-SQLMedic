@@ -1,0 +1,9 @@
+create or replace function login(usuario1 in usuario_objtab.usuario%type,contrasena1 in usuario_objtab.contrasena%type,nombre1 out usuario_objtab.nombre%type,email1 out usuario_objtab.email%type,estado1 out usuario_objtab.estado%type) return number as
+begin
+
+select nombre,email,estado into nombre1,email1,estado1 from usuario_objtab where contrasena1=contrasena and usuario=usuario1;
+return 0;
+exception
+when no_data_found then
+return 1;
+end;

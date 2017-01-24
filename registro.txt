@@ -1,0 +1,19 @@
+create or replace function registro(usuario1 varchar2,contrasena1 varchar2,nombre1 varchar2,email varchar2,estado varchar2) return number as
+
+begin
+
+insert into bandeja_objtab(usuario,mensajesEntrada,mensajesSalida,NUEVO_MENSAJE) values(usuario1,mensajes_ntabtyp(mensajeobj(0,'Prueba',
+(select ref(c) from usuario_objtab c where c.USUARIO='admin'),(select ref(c) from usuario_objtab c where c.USUARIO='admin'),' '
+,sysdate,1)),mensajes_ntabtyp(mensajeobj(0,'Prueba',
+(select ref(c) from usuario_objtab c where c.USUARIO='admin'),(select ref(c) from usuario_objtab c where c.USUARIO='admin'),' '
+,sysdate,1) ),0);
+
+insert into usuario_objtab(usuario,contrasena,email,estado,nombre,fecha_ingreso,numero_consultas,bandeja,AMIGOS) values(usuario1,contrasena1,email,estado,nombre1,sysdate,1,(select ref(c) from bandeja_objtab c where c.usuario=usuario1),
+amigos_ntabtyp((select ref(c) from usuario_objtab c where c.USUARIO='admin')));
+
+
+return 0;
+exception
+when DUP_VAL_ON_INDEX then
+return 1;
+end;

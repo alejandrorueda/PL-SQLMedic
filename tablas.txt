@@ -1,0 +1,32 @@
+create table Historial_objtab OF HISTORIALOBJ(
+IDHISTORIAL PRIMARY KEY,
+CHECK (numero_de_busquedas >=0)
+)
+NESTED TABLE busquedas STORE AS LineaPedido_ntab;
+
+
+create table usuario_objtab OF UsuarioObj(
+usuario PRIMARY KEY,
+nombre NOT NULL,
+EMAIL NOT NULL,
+FECHA_INGRESO NOT NULL,
+CONTRASENA NOT NULL,
+estado NOT NULL,
+bandeja references BANDEJA_OBJTAB,
+CHECK (numero_consultas > 0)
+)NESTED TABLE amigos STORE AS amigos_ntab;
+
+create table bandeja_objtab OF bandejaObj(
+usuario PRIMARY KEY
+)NESTED TABLE mensajesEntrada STORE AS entrada_ntab(),
+NESTED TABLE mensajesSalida STORE AS salida_ntab();
+
+alter table entrada_ntab add(
+SCOPE FOR (EMISOR) IS usuario_objtab,
+SCOPE FOR (destinatario) IS usuario_objtab
+);
+
+alter table salida_ntab add(
+SCOPE FOR (EMISOR) IS usuario_objtab,
+SCOPE FOR (destinatario) IS usuario_objtab
+);

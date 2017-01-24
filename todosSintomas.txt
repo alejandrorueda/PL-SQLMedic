@@ -1,0 +1,13 @@
+create or replace function  todosSintomas(cadena varchar2) return varchar2 as
+todos varchar2(9000) := '';
+begin
+
+for p_sintomas in (select sintomas from sintomas_enfermedad s group by s.SINTOMAS) loop
+
+todos := todos||';'||p_sintomas.sintomas;
+
+end loop;
+
+return todos;
+
+end;

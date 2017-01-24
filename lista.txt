@@ -1,0 +1,40 @@
+create or replace function lista(in_string VARCHAR2, delim VARCHAR2) return enfermedad_t as
+i number := 0;
+j number := 0;
+    pos number :=0;
+    lv_str varchar2(100) := TRIM(in_string);
+   
+    strings enfermedad_t;
+    
+    BEGIN
+  strings := enfermedad_t();
+   strings.EXTEND(100);
+   strings := enfermedad_t(' ',' ');
+   strings.EXTEND(98,1);
+   
+      if instr(lv_str, delim,1,1) = 0 then
+      strings(1):=substr(lv_str,1,length(lv_str));
+      end if;
+      pos := instr(lv_str, delim,1,1);
+              
+      WHILE ( pos != 0) LOOP
+        i := i + 1;
+       
+        strings(i) := substr(lv_str,1,pos);
+       
+        while substr(lv_str, pos+1,1) = ' ' loop 
+        pos:= pos+1;    
+        end loop;
+        
+        lv_str :=  substr(lv_str, pos+1,length(lv_str));
+        pos := instr(lv_str, delim, 1, 1);
+       
+        If pos = 0 THEN
+          strings (i+1) := lv_str;
+         
+          END IF;
+         
+          END LOOP;
+      
+          RETURN strings;
+end ;

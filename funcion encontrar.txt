@@ -1,0 +1,146 @@
+create or replace function       encontrar(conjSintomas varchar2) return varchar2 as
+str enfermedad_t := lista(conjSintomas,' ');
+i number := 0;
+k number :=0;
+recorrer number :=0;
+j number := 0;
+l number := 0;
+contador float(50) := 0;
+nsintomas number := 0;
+coincidencias repetidos;
+rep repetidos;
+longcoma number;
+coincidencias2 number := 0;
+total number := 0;
+cadena varchar2(200);
+primero number := 0;
+nombr Sintomas_Enfermedad.Nombre%type;
+putolike SINTOMAS_ENFERMEDAD.SINTOMAS%type;
+proposicion number := 0;
+proposicion2 number := 0;
+listadofinal varchar2(499);
+begin
+
+  coincidencias := repetidos();
+   coincidencias.EXTEND(30000);
+   coincidencias := repetidos(' ',' ');
+   coincidencias.EXTEND(29998,1);
+
+rep := repetidos();
+rep.EXTEND(30000);
+rep := repetidos(' ',' ');
+rep.EXTEND(29998,1);
+
+i := 1;
+ while ((i <= 100)) 
+    loop
+         
+        if str(i) != ' ' then 
+        nsintomas := nsintomas +1;
+        end if;
+    i := i+1;
+    end loop;
+    
+  i:=0;
+  k :=0;
+  
+ while ( j <nsintomas ) 
+   loop
+    
+     j := j+1;
+     putolike := LOWER(str(j)); 
+     putolike := '%'||putolike||'%';
+    
+         for patologia in ( select numero,NOMBRE from Sintomas_Enfermedad where Sintomas= lower(TRIM(str(j))) OR  Sintomas LIKE putolike ) 
+             loop  
+              i := i+1;
+              k:= k+1;
+              primero :=0;
+           /*  DBMS_OUTPUT.PUT_LINE(patologia.Nombre);*/
+               if j < nsintomas then
+                      while coincidencias2=total 
+                         loop
+                          proposicion := j;
+                          while TRIM(str(j+1))='de' or TRIM(str(j+1))='del' or TRIM(str(j+1))='en' or TRIM(str(j+1))='el' or TRIM(str(j+1))='la' or TRIM(str(j+1))='los'loop
+                          proposicion2 := 1;
+                          j := j+1;
+                          end loop;
+                          total := total +1;
+                        
+                          if total = 1 then
+                            
+                            cadena := TRIM(LOWER(str(proposicion)))||'% %'||TRIM(LOWER(str(j+1)));
+                            cadena := '%'||cadena||'%';
+                            
+                          else
+                                
+                            cadena := cadena||' %'||TRIM(LOWER(str(j+1)))||'%';
+                            
+                          end if;
+                          primero := 0;
+                          for patologia in ( select numero,NOMBRE from Sintomas_Enfermedad where Sintomas like cadena  ) loop
+                            primero := 1;
+                            nombr := patologia.Nombre;
+                            
+                              if  coincidencias2 = 0 then
+                                i:=i+1;
+                                rep(i) := nombr;
+                                coincidencias(k) := nombr;
+                                 DBMS_OUTPUT.PUT_LINE(cadena||' '||patologia.nombre);
+                               end if;
+                               
+                          end loop;
+                          if primero =1 then
+                          j := j + 2;
+                          coincidencias2 := coincidencias2 +1;
+                          end if;
+                          
+                       end loop;
+                  end if;
+                  
+                  while (recorrer<k) 
+                    loop
+                        recorrer := recorrer+1;
+                       
+                        if coincidencias(recorrer) = patologia.Nombre then
+                        DBMS_OUTPUT.PUT_LINE(str(recorrer)||' '||patologia.nombre);
+                        primero :=1;
+                        end if;
+                    end loop;
+                    recorrer:=0;
+            total := 0;
+            coincidencias2 := 0;
+              l := 1;
+                   
+                    if primero < 1 AND str(j)!=' ' then
+                        nombr := patologia.Nombre;
+                        rep(i) := nombr;
+                        coincidencias(k) := nombr;
+                        /*DBMS_OUTPUT.PUT_LINE(str(j)||' '||patologia.nombre);*/
+                    end if;
+               primero := 0;     
+              end loop;  
+      
+   k:=0;
+   coincidencias := repetidos();
+   coincidencias.EXTEND(30000);
+   coincidencias := repetidos(' ',' ');
+   coincidencias.EXTEND(29998,1);
+   end loop;
+   
+   
+     k:=0;
+        for resultado in (select column_value,COUNT(column_value) as numero from table(cast(rep as repetidos)) WHERE column_value!=' ' GROUP BY COLUMN_VALUE ORDER BY numero DESC) 
+     loop
+     k := k+1;
+      if k <10 then
+      
+      listadofinal :=listadofinal||';'||resultado.column_value||':'||resultado.numero;
+      
+      end if;
+      
+
+     end loop;
+         DBMS_OUTPUT.PUT_LINE(listadofinal);
+   return listadofinal||';';
+end;

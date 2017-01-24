@@ -1,0 +1,33 @@
+create or replace function obtenerMensajeEntrada(usuario1 in varchar2,ids out varchar2,fecha out varchar2,mensaje out varchar2,leido out varchar2,destinatario out varchar2) return varchar2 as
+listadofinal varchar2(499) := '';
+destinatario2 usuario_objtab.usuario%type;
+begin
+listadofinal := '';
+ids := '';
+fecha := '';
+mensaje := '';
+leido := '';
+destinatario := '';
+for v_mensaje in (select * from table(select mensajesEntrada from bandeja_objtab where usuario=usuario1)) loop
+
+listadofinal := listadofinal||';'||v_mensaje.asunto;
+ids := ids||';'||v_mensaje.idmensaje;
+fecha := fecha||';'||v_mensaje.fecha;
+mensaje := mensaje||';'||v_mensaje.mensjae;
+leido := leido||';'||v_mensaje.leido;
+select c.usuario into destinatario2 from usuario_objtab c where ref(c)=v_mensaje.destinatario;
+destinatario := destinatario||';'||destinatario2;
+
+end loop;
+
+listadofinal := listadofinal||';';
+ids := ids||';';
+fecha := fecha||';';
+mensaje := mensaje||';';
+leido := leido||';';
+destinatario := destinatario||';';
+DBMS_OUTPUT.PUT_LINE(listadofinal);
+
+return listadofinal;
+
+end;

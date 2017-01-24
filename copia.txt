@@ -1,0 +1,74 @@
+create or replace TYPE SinonimoObj AS OBJECT(
+IDSINONIMO NUMBER(10),
+NOMBRE   NUMBER(38),
+SINTOMA REF SINTOMAOBJ
+);
+create or replace TYPE SINONIMOS_NTABTYP AS TABLE OF SINONIMOOBJ;
+
+create or replace TYPE SintomaObj AS OBJECT(
+IDSINTOMA NUMBER(10),
+NOMBRE    NUMBER(30),
+DESCRIPCIÓN DATE,
+SINONIMOS SINONIMOS_NTABTYP
+);
+
+create or replace TYPE UsuarioObj AS OBJECT(
+Usuario varchar2(20),
+contrasena varCHAR2(20),
+email varchar2(50),
+estado varchar2(30),
+nombre varchar2(50),
+fecha_ingreso date,
+amigos amigos_NTABTYP,
+bandeja ref bandejaobj,
+ultima_consulta date,
+numero_consultas number(10)
+);
+
+create or replace TYPE amigos_NTABTYP AS TABLE OF ref usuarioOBJ;
+
+create or replace type mensajeobj as object(
+idmensaje number(10),
+asunto varchar2(30),
+destinatario usuarioobj,
+emisor usuarioobj,
+mensjae varchar2(20),
+fecha date,
+leido number(1)
+); 
+
+
+create or replace TYPE mensajes_NTABTYP AS TABLE OF mensajeOBJ;
+
+create or replace type bandejaobj as object(
+usuario varchar2(20),
+mensajesEntrada mensajes_NTABTYP,
+mensajesSalida mensajes_NTABTYP,
+nuevo_mensaje number(2)
+); 
+
+
+
+
+create or replace TYPE lineas_NTABTYP AS TABLE OF lineasOBJ;
+
+create or replace TYPE lineasObj AS OBJECT(
+IDlinea NUMBER(10),
+busqueda   varchar2(500),
+enfermedad  varchar2(20),
+fecha date
+);
+
+create or replace TYPE HistorialObj AS OBJECT(
+IDhistorial NUMBER(10),
+ultima_busqueda date,
+numero_de_busquedas number(10),
+busquedas lineas_NTABTYP
+);
+
+insert into table(select mensajesEntrada from bandeja_objtab where usuario='jose2') values(2,'Prueba',
+(select ref(c) from usuario_objtab c where c.USUARIO='jose'),(select ref(c) from usuario_objtab c where c.USUARIO='jose'),'yyyyyy'
+,sysdate,1);
+
+
+DELETE FROM table(select mensajesSalida from bandeja_objtab where usuario='frende') f where f.idmensaje>2;
